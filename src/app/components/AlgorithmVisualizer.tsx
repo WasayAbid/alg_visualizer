@@ -114,9 +114,6 @@ const styles = {
     backgroundColor: "#2196f3",
   } as React.CSSProperties,
   backButton: {
-    position: "absolute",
-    top: "20px",
-    left: "20px",
     backgroundColor: "rgba(0, 0, 0, 0.1)",
     border: "2px solid #fff",
     color: "#fff",
@@ -355,7 +352,7 @@ const Visualization: React.FC = () => {
         prepareSteps(currentAlgorithm, parsedArray);
       } catch (e) {
         alert("Please enter valid comma separated integers.");
-        console.log(e);
+        console.error(e);
       }
     }
   };
@@ -368,6 +365,11 @@ const Visualization: React.FC = () => {
     setShowNextButton(true);
     setShowHomeButton(false);
     setShowBackButton(true);
+  };
+  const goBackFromInputScreen = () => {
+    setShowInput(false);
+    setCurrentAlgorithm(null);
+    setShowHomeButton(false);
   };
 
   const resetVisualization = () => {
@@ -646,7 +648,6 @@ const Visualization: React.FC = () => {
       [algorithmName]: styles.selectionBox,
     }));
   };
-
   return (
     <div style={styles.body}>
       <style>{styles.keyframes}</style>
@@ -679,14 +680,6 @@ const Visualization: React.FC = () => {
         </div>
 
         <div
-          className="cartoon-animation"
-          ref={cartoonRef}
-          style={{ display: "none" }}
-        >
-          🎉 Lets Visualize It! 🚀
-        </div>
-
-        <div
           className="confetti"
           ref={confettiRef}
           style={{ display: "none" }}
@@ -696,7 +689,30 @@ const Visualization: React.FC = () => {
           Created by ABDUL WASAY ABID and SADDIQA SHAHID
         </div>
       </div>
-
+      {showInput && (
+        <button
+          style={{
+            ...backButtonStyle,
+            position: "absolute",
+            top: "20px",
+            left: "20px",
+          }}
+          onClick={goBackFromInputScreen}
+          onMouseEnter={(e) => {
+            setBackButtonStyle({
+              ...backButtonStyle,
+              ...styles.backButtonHover,
+            });
+            console.log(e);
+          }}
+          onMouseLeave={(e) => {
+            setBackButtonStyle(styles.backButton);
+            console.log(e);
+          }}
+        >
+          Go Back
+        </button>
+      )}
       <div
         id="input-array-container"
         style={{
