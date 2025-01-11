@@ -123,6 +123,10 @@ const styles = {
     fontSize: "1.5em",
     textShadow: "0px 4px 6px rgba(0, 0, 0, 0.7)",
     transition: "background-color 0.3s ease",
+    position: "absolute",
+    top: "20px",
+    left: "20px",
+    zIndex: 102,
   } as React.CSSProperties,
   backButtonHover: {
     backgroundColor: "rgba(0, 0, 0, 0.2)",
@@ -294,6 +298,8 @@ const Visualization: React.FC = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [inputArray, setInputArray] = useState<number[] | null>(null);
   const [showHomeButton, setShowHomeButton] = useState(false);
+  const [sortedIndices, setSortedIndices] = useState<Set<number>>(new Set());
+  const [allSorted, setAllSorted] = useState(false);
 
   const showCartoonAnimation = () => {
     if (cartoonRef.current) {
@@ -365,6 +371,8 @@ const Visualization: React.FC = () => {
     setShowNextButton(true);
     setShowHomeButton(false);
     setShowBackButton(true);
+    setSortedIndices(new Set());
+    setAllSorted(false);
   };
   const goBackFromInputScreen = () => {
     setShowInput(false);
@@ -377,6 +385,8 @@ const Visualization: React.FC = () => {
       containerRef.current.innerHTML = "";
       setSteps([]);
       setCurrentStepIndex(0);
+      setSortedIndices(new Set());
+      setAllSorted(false);
     }
   };
 
@@ -430,11 +440,23 @@ const Visualization: React.FC = () => {
       if (stepExplanationElement) {
         stepExplanationElement.textContent = "Sorting Complete!";
         setShowHomeButton(true);
+        setAllSorted(true);
+        applyFinalSortedState();
       }
     }
   };
   const goToHomePage = () => {
     window.location.reload();
+  };
+
+  const applyFinalSortedState = () => {
+    if (!containerRef.current) return;
+    const bars = Array.from(
+      containerRef.current.querySelectorAll<HTMLElement>(".data-bar")
+    );
+    bars.forEach((bar) => {
+      Object.assign(bar.style, styles.dataBarSorted);
+    });
   };
 
   const applyStep = () => {
@@ -453,8 +475,14 @@ const Visualization: React.FC = () => {
       containerRef.current.querySelectorAll<HTMLElement>(".data-bar")
     );
 
-    bars.forEach((bar) => {
+    bars.forEach((bar, index) => {
       Object.assign(bar.style, styles.dataBar);
+      if (sortedIndices.has(index)) {
+        Object.assign(bar.style, styles.dataBarSorted);
+      }
+      if (allSorted) {
+        Object.assign(bar.style, styles.dataBarSorted);
+      }
       bar.classList.remove("current");
       bar.classList.remove("swapped");
     });
@@ -480,8 +508,7 @@ const Visualization: React.FC = () => {
       bars[step.swap[1]].textContent = tempHeight;
     }
     if (step.sortedIndex !== undefined) {
-      Object.assign(bars[step.sortedIndex].style, styles.dataBarSorted);
-      bars[step.sortedIndex].classList.add("sorted");
+      setSortedIndices((prev) => new Set(prev).add(step.sortedIndex as number));
     }
 
     setCurrentStepIndex((prevIndex) => prevIndex + 1);
@@ -491,6 +518,7 @@ const Visualization: React.FC = () => {
     const steps: Step[] = [];
     const n = arr.length;
     const arrCopy = [...arr];
+
     for (let i = 0; i < n - 1; i++) {
       let minIndex = i;
       for (let j = i + 1; j < n; j++) {
@@ -750,7 +778,12 @@ const Visualization: React.FC = () => {
       >
         {showBackButton && (
           <button
-            style={backButtonStyle}
+            style={{
+              ...backButtonStyle,
+              position: "absolute",
+              top: "20px",
+              left: "20px",
+            }}
             onClick={goBack}
             onMouseEnter={() => {
               setBackButtonStyle({
