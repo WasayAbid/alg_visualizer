@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useRef } from "react";
+import AlgorithmInfoPage from "./AlgorithmInfoPage"; // Import the new component
 
 const styles = {
   /* Ensure full viewport height initially */
@@ -78,40 +79,45 @@ const styles = {
     flexWrap: "wrap",
     justifyContent: "center",
     alignItems: "flex-start",
-    width: "100%",
-    maxWidth: "80%",
+    width: "80%",
+    maxWidth: "1000px",
     marginTop: "10px",
-    background: "#444",
-    borderRadius: "15px",
-    padding: "20px",
-    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.3)",
+    background: "rgba(50, 50, 50, 0.8)",
+    borderRadius: "20px",
+    padding: "30px",
+    boxShadow: "0px 8px 20px rgba(0, 0, 0, 0.4)",
     position: "fixed",
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
     zIndex: 100,
+    border: "1px solid rgba(255, 255, 255, 0.1)",
+    backdropFilter: "blur(10px)",
   } as React.CSSProperties,
   dataBar: {
-    width: "40px",
-    height: "40px",
+    width: "60px",
+    height: "60px",
     margin: "5px",
-    backgroundColor: "#4caf50",
+    background: "linear-gradient(to bottom, #4caf50, #43a047)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
     color: "white",
     fontWeight: "bold",
-    transition: "background-color 0.3s ease",
+    transition: "background-color 0.3s ease, transform 0.2s ease",
     boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.2)",
+    borderRadius: "50%",
+    minWidth: "50px",
+    fontSize: "1.2em",
   } as React.CSSProperties,
   dataBarCurrent: {
-    backgroundColor: "#ff9800",
+    background: "linear-gradient(to bottom, #ff9800, #f57c00)",
   } as React.CSSProperties,
   dataBarSwapped: {
-    backgroundColor: "#f44336",
+    background: "linear-gradient(to bottom, #f44336, #d32f2f)",
   } as React.CSSProperties,
   dataBarSorted: {
-    backgroundColor: "#2196f3",
+    background: "linear-gradient(to bottom, #2196f3, #1976d2)",
   } as React.CSSProperties,
   backButton: {
     backgroundColor: "rgba(0, 0, 0, 0.1)",
@@ -195,6 +201,7 @@ const styles = {
     padding: "3px",
     transform: "rotate(45deg)",
     transition: "opacity 0.3s ease",
+    zIndex: 101,
   } as React.CSSProperties,
   arrowActive: {
     opacity: 1,
@@ -211,7 +218,7 @@ const styles = {
     top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
-    background: "#444",
+    background: "rgba(50, 50, 50, 0.8)",
     padding: "20px",
     borderRadius: "15px",
     boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.3)",
@@ -268,6 +275,8 @@ const Visualization: React.FC = () => {
   const [showVisualizationPage, setShowVisualizationPage] =
     useState<boolean>(false);
   const [showBackButton, setShowBackButton] = useState(true);
+  const [showAlgorithmInfoPage, setShowAlgorithmInfoPage] =
+    useState<boolean>(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const cartoonRef = useRef<HTMLDivElement>(null);
@@ -323,13 +332,19 @@ const Visualization: React.FC = () => {
     }
   };
 
-  const handleShowInput = (algorithmName: string) => {
+  const handleShowAlgorithmInfo = (algorithmName: string) => {
     showCartoonAnimation();
     showConfetti();
     setCurrentAlgorithm(algorithmName);
-    setShowInput(true);
+    setShowAlgorithmInfoPage(true);
     setShowHomeButton(false);
   };
+
+  const handleStartInput = () => {
+    setShowAlgorithmInfoPage(false);
+    setShowInput(true);
+  };
+
   const handleStartVisualizationFromInput = () => {
     const inputElement = document.getElementById(
       "array-input"
@@ -374,10 +389,15 @@ const Visualization: React.FC = () => {
     setSortedIndices(new Set());
     setAllSorted(false);
   };
+
   const goBackFromInputScreen = () => {
     setShowInput(false);
     setCurrentAlgorithm(null);
-    setShowHomeButton(false);
+    setShowAlgorithmInfoPage(true);
+  };
+  const goBackFromInfoPage = () => {
+    setShowAlgorithmInfoPage(false);
+    setCurrentAlgorithm(null);
   };
 
   const resetVisualization = () => {
@@ -489,7 +509,7 @@ const Visualization: React.FC = () => {
 
     if (step.indices) {
       if (step.indices.length > 1) {
-        showComparisonArrow(bars[step.indices[0]], bars[step.indices[1]], true);
+        showComparisonArrow(bars[step.indices[0]], bars[step.indices[1]]);
       }
       step.indices.forEach((index) => {
         Object.assign(bars[index].style, styles.dataBarCurrent);
@@ -615,11 +635,7 @@ const Visualization: React.FC = () => {
     return steps;
   };
 
-  const showComparisonArrow = (
-    bar1: HTMLElement,
-    bar2: HTMLElement,
-    above: boolean = false
-  ) => {
+  const showComparisonArrow = (bar1: HTMLElement, bar2: HTMLElement) => {
     if (!containerRef.current) return;
     const rect1 = bar1.getBoundingClientRect();
     const rect2 = bar2.getBoundingClientRect();
@@ -631,14 +647,10 @@ const Visualization: React.FC = () => {
 
     const containerRect = containerRef.current.getBoundingClientRect();
 
-    let arrowTop;
     let arrowLeft;
 
-    if (above) {
-      arrowTop = Math.min(rect1.top, rect2.top) - containerRect.top - 20;
-    } else {
-      arrowTop = (rect1.top + rect2.top) / 2 - containerRect.top - 10;
-    }
+    const arrowTop = Math.min(rect1.top, rect2.top) - containerRect.top - 20;
+
     arrowLeft = rect1.left + rect1.width / 2 - containerRect.left;
 
     if (rect1.left > rect2.left) {
@@ -682,7 +694,10 @@ const Visualization: React.FC = () => {
       <div
         id="landing-page"
         style={{
-          display: showInput || showVisualizationPage ? "none" : "flex",
+          display:
+            showInput || showVisualizationPage || showAlgorithmInfoPage
+              ? "none"
+              : "flex",
           flexDirection: "column",
           alignItems: "center",
         }}
@@ -692,7 +707,7 @@ const Visualization: React.FC = () => {
 
         <div
           style={selectionBoxStyle["Selection Sort"]}
-          onClick={() => handleShowInput("Selection Sort")}
+          onClick={() => handleShowAlgorithmInfo("Selection Sort")}
           onMouseEnter={() => handleMouseEnter("Selection Sort")}
           onMouseLeave={() => handleMouseLeave("Selection Sort")}
         >
@@ -700,7 +715,7 @@ const Visualization: React.FC = () => {
         </div>
         <div
           style={selectionBoxStyle["Insertion Sort"]}
-          onClick={() => handleShowInput("Insertion Sort")}
+          onClick={() => handleShowAlgorithmInfo("Insertion Sort")}
           onMouseEnter={() => handleMouseEnter("Insertion Sort")}
           onMouseLeave={() => handleMouseLeave("Insertion Sort")}
         >
@@ -717,6 +732,20 @@ const Visualization: React.FC = () => {
           Created by ABDUL WASAY ABID and SADDIQA SHAHID
         </div>
       </div>
+      {showAlgorithmInfoPage && (
+        <div>
+          <AlgorithmInfoPage
+            algorithmName={
+              currentAlgorithm === "Selection Sort" ||
+              currentAlgorithm === "Insertion Sort"
+                ? currentAlgorithm
+                : "Selection Sort"
+            }
+            onStartInput={handleStartInput}
+            onGoBack={goBackFromInfoPage}
+          />
+        </div>
+      )}
       {showInput && (
         <button
           style={{
