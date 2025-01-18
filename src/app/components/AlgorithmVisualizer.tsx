@@ -95,8 +95,8 @@ const styles = {
     backdropFilter: "blur(10px)",
   } as React.CSSProperties,
   dataBar: {
-    width: "60px",
-    height: "60px",
+    width: "80px",
+    height: "80px",
     margin: "5px",
     background: "linear-gradient(to bottom, #4caf50, #43a047)",
     display: "flex",
@@ -106,9 +106,9 @@ const styles = {
     fontWeight: "bold",
     transition: "background-color 0.3s ease, transform 0.2s ease",
     boxShadow: "0px 2px 5px rgba(0, 0, 0, 0.2)",
-    borderRadius: "50%",
+    borderRadius: "8px",
     minWidth: "50px",
-    fontSize: "1.2em",
+    fontSize: "3.0em",
   } as React.CSSProperties,
   dataBarCurrent: {
     background: "linear-gradient(to bottom, #ff9800, #f57c00)",
@@ -198,11 +198,15 @@ const styles = {
     border: "2px solid rgba(255, 255, 255, 0.8)",
     borderWidth: "0 2px 2px 0",
     display: "inline-block",
-    padding: "3px",
-    transform: "rotate(45deg)",
+    padding: "15px",
+    transform: "rotate(45deg) translate(-50%, -50%)", // Keeps proper rotation and alignment
     transition: "opacity 0.3s ease",
     zIndex: 101,
-  } as React.CSSProperties,
+    top: "-20px", // Positions the arrow above the element
+    left: "25%", // Adjusts to the middle of the element
+    marginLeft: "-15px", // Shifts the arrow left (adjust this value as needed)
+  },
+
   arrowActive: {
     opacity: 1,
   } as React.CSSProperties,

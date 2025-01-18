@@ -18,6 +18,7 @@ const styles = {
     border: "1px solid rgba(255, 255, 255, 0.1)",
     width: "80%",
     maxWidth: "900px",
+    textAlign: "left", // Added this to align everything left by default
   } as React.CSSProperties,
   algorithmInfoTitle: {
     fontFamily: "Poppins, sans-serif",
@@ -25,20 +26,21 @@ const styles = {
     color: "#fff",
     marginBottom: "20px",
     textShadow: "0px 4px 6px rgba(0, 0, 0, 0.6)",
+    textAlign: "left", // Adjusted to left
   } as React.CSSProperties,
   algorithmInfoDescription: {
     fontSize: "1.3em",
     color: "#fff",
     marginBottom: "20px",
     lineHeight: "1.7",
-    textAlign: "center",
+    textAlign: "left", // Adjusted to left
   } as React.CSSProperties,
   algorithmInfoComplexity: {
     color: "#fff",
     marginBottom: "10px",
     fontSize: "1.1em",
     lineHeight: "1.5",
-    textAlign: "center",
+    textAlign: "left", // Adjusted to left
   } as React.CSSProperties,
   algorithmInfoButton: {
     backgroundColor: "rgba(0, 0, 0, 0.1)",
@@ -68,16 +70,18 @@ const algorithmInfo = {
   "Selection Sort": {
     title: "Selection Sort",
     description:
-      "Imagine you have a messy pile of toys and want to organize them by size. Selection Sort is like picking the smallest toy and placing it first, then finding the next smallest, and so on. It was made to sort things in a very basic way. The main goal is to make it easy to understand how sorting works.",
-    timeComplexity: "Time Complexity: O(n^2) in all cases",
-    spaceComplexity: "Space Complexity: O(1)",
+      "It repeatedly finds the smallest element from the unsorted part and moves it to the front.",
+    steps: `1. Start with the first element.\n2. Find the smallest element in the unsorted part.\n3. Swap it with the first unsorted element.\n4. Move the boundary of the sorted part forward.\n5. Repeat until sorted.`,
+    timeComplexity: `Worst-case: O(n²)\nBest-case: O(n²)\nAverage-case: O(n²)`,
+    spaceComplexity: "Space Complexity: O(1) (in-place sorting)",
   },
   "Insertion Sort": {
     title: "Insertion Sort",
     description:
-      "Imagine you're arranging books on a shelf. Insertion Sort works like you're taking one book at a time and putting it in the right spot among the books you've already placed. This algorithm was made to be straightforward and is especially good for small lists or when you need to sort data as you receive it.",
-    timeComplexity: "Time Complexity: O(n^2) worst case | O(n) best case",
-    spaceComplexity: "Space Complexity: O(1)",
+      "It starts from the second element and places it in its correct position, repeating this for each subsequent element until the list is sorted.",
+    steps: `1. Start from the second element.\n2. Compare it with the previous one.\n3. Shift larger elements to the right.\n4. Insert the current element in its correct position.\n5. Repeat until sorted.`,
+    timeComplexity: `Worst-case: O(n²)\nBest-case: O(n)\nAverage-case: O(n²)`,
+    spaceComplexity: "Space Complexity: O(1) (in-place sorting)",
   },
 };
 
@@ -88,12 +92,28 @@ const AlgorithmInfoPage: React.FC<AlgorithmInfoPageProps> = ({
 }) => {
   const info = algorithmInfo[algorithmName];
 
+  const formatTextWithLineBreaks = (text: string) => {
+    return text.replace(/\n/g, "<br/>");
+  };
+
   return (
     <div style={styles.algorithmInfoPage}>
       <h2 style={styles.algorithmInfoTitle}>{info.title}</h2>
       <p style={styles.algorithmInfoDescription}>{info.description}</p>
-      <p style={styles.algorithmInfoComplexity}>{info.timeComplexity}</p>
+      <p
+        style={styles.algorithmInfoComplexity}
+        dangerouslySetInnerHTML={{
+          __html: formatTextWithLineBreaks(info.steps),
+        }}
+      />
+      <p
+        style={styles.algorithmInfoComplexity}
+        dangerouslySetInnerHTML={{
+          __html: formatTextWithLineBreaks(info.timeComplexity),
+        }}
+      />
       <p style={styles.algorithmInfoComplexity}>{info.spaceComplexity}</p>
+
       <button
         style={styles.algorithmInfoButton}
         onClick={onStartInput}
